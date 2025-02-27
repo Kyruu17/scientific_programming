@@ -1,0 +1,41 @@
+import os
+import pandas as pd
+from kaggle.api.kaggle_api_extended import KaggleApi
+
+# Step 1: Replace the kaggle.json File
+# Ensure your kaggle.json file is in the correct location
+
+# Step 2: Use the Kaggle Web API to Download the Titanic Data Set
+os.environ['KAGGLE_USERNAME'] = 'your-kaggle-user-name'
+os.environ['KAGGLE_KEY'] = 'your-kaggle-api-key'
+
+api = KaggleApi()
+api.authenticate()
+
+dataset = 'yasserh/titanic-dataset'
+file_name = 'Titanic-Dataset.csv'
+api.dataset_download_file(dataset, file_name, path='./')
+
+# Load the data set
+df = pd.read_csv('Titanic-Dataset.csv')
+
+# Step 3: Identify the Data Types in the Titanic Data Set
+print(df.dtypes)
+
+# Step 4: Transform Variable 'Sex' (Gender) to a Two-Column Matrix with (0/1) Values
+df['Sex'] = df['Sex'].map({'male': 0, 'female': 1})
+print(df[['Sex']].head())
+
+# Step 5: Create a Subset of the Titanic Data
+subset = df[
+    (df['Survived'] == 1) &
+    (
+        (df['Sex'] == 1) & (df['Age'] > 45) |
+        (df['Sex'] == 0) & (df['Age'] < 20)
+    )
+]
+print(subset)
+
+# Step 6: Answer the Question: How Many Passengers Were Selected?
+num_selected_passengers = subset.shape[0]
+print(f"Number of selected passengers: {num_selected_passengers}")
